@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>520恋爱人格测试 · 超详细解读版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            background: linear-gradient(145deg, #ff9a9e 0%, #fad0c4 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: system-ui, -apple-system, 'Segoe UI', 'PingFang SC', Roboto, 'Helvetica Neue', sans-serif;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            width: 100%;
+            margin: 20px auto;
+            background: rgba(255,255,255,0.94);
+            border-radius: 48px;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.2);
+            overflow: hidden;
+            backdrop-filter: blur(2px);
+        }
+        .quiz-panel, .result-panel {
+            padding: 28px 24px 36px;
+        }
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            text-align: center;
+            background: linear-gradient(135deg, #c31432, #ff4e50);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 8px;
+        }
+        .sub {
+            text-align: center;
+            color: #e65c5c;
+            font-weight: 500;
+            margin-bottom: 28px;
+            font-size: 14px;
+        }
+        .progress {
+            background: #ffe0e0;
+            border-radius: 40px;
+            height: 8px;
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            background: #ff4d6d;
+            width: 0%;
+            height: 100%;
+            border-radius: 40px;
+            transition: width 0.25s;
+        }
+        .question {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 28px;
+            line-height: 1.35;
+            color: #2d2f36;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 30px;
+            max-height: 60vh;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        .option-btn {
+            background: white;
+            border: 1.5px solid #ffb7b7;
+            border-radius: 60px;
+            padding: 12px 18px;
+            font-size: 16px;
+            font-weight: 500;
+            text-align: left;
+            color: #2d2f36;
+            transition: all 0.2s;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .option-btn:active {
+            background: #fff0f0;
+            border-color: #ff7b7b;
+            transform: scale(0.98);
+        }
+        .next-area {
+            display: flex;
+            justify-content: center;
+        }
+        .next-btn {
+            background: #ff4d6d;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 50px;
+            color: white;
+            font-weight: 600;
+            font-size: 18px;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 6px 14px rgba(255,77,109,0.4);
+        }
+        .next-btn:active {
+            transform: scale(0.96);
+        }
+        .result-card-area {
+            text-align: center;
+        }
+        canvas {
+            width: 100%;
+            border-radius: 32px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .save-tip {
+            background: #fff5e8;
+            padding: 12px;
+            border-radius: 40px;
+            font-size: 14px;
+            color: #b95b3c;
+            margin: 20px 0 12px;
+            font-weight: 500;
+        }
+        .reset-btn {
+            background: none;
+            border: 2px solid #ffb7b7;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            color: #c73659;
+            margin-top: 20px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+        }
+        footer {
+            text-align: center;
+            font-size: 12px;
+            color: #a97070;
+            padding: 18px 0 12px;
+            border-top: 1px solid #ffe0e0;
+        }
+        .hidden {
+            display: none;
+        }
+        @media (max-width: 500px) {
+            .quiz-panel, .result-panel { padding: 20px 18px 28px; }
+            .question { font-size: 20px; }
+            .option-btn { font-size: 14px; padding: 10px 14px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container" id="app">
+    <div id="quizPanel" class="quiz-panel">
+        <h1>💘 520恋爱人格测试</h1>
+        <div class="sub">8道题，测出你今晚的朋友圈人设</div>
+        <div class="progress"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="question" id="questionText">加载中...</div>
+        <div class="options" id="optionsContainer"></div>
+        <div class="next-area">
+            <button class="next-btn" id="nextBtn">下一题 ➡️</button>
+        </div>
+    </div>
+
+    <div id="resultPanel" class="result-panel hidden">
+        <div class="result-card-area">
+            <h1>🎭 你的520人格报告</h1>
+            <div style="margin: 10px 0 5px; font-size: 15px; color:#d14b6a;">长按图片 → 保存 → 发朋友圈</div>
+            <canvas id="resultCanvas" width="1080" height="1350" style="width:100%; height:auto; border-radius: 32px;"></canvas>
+            <div class="save-tip">
+                📸 长按上方图片，保存到相册，发朋友圈<br>
+                👉 顺便@你那个最抽象的朋友来测
+            </div>
+            <button class="reset-btn" id="resetBtn">🔁 再测一次</button>
+        </div>
+        <footer>💥 纯属娱乐 · 今日限定社交货币</footer>
+    </div>
+</div>
+
+<script>
+    // ---------- 8道题，每题6个选项，分值1-6 ----------
+    const QUESTIONS = [
+        {
+            text: "520零点刚过，你微信第一个消息是？",
+            options: [
+                { text: "💸 转账5200，笑醒", score: 6 },
+                { text: "🧧 转账520，有点开心", score: 5 },
+                { text: "📦 拼多多砍一刀链接", score: 4 },
+                { text: "🔔 公众号推送：『520特惠』", score: 3 },
+                { text: "👻 群发『520快乐』（复制粘贴）", score: 2 },
+                { text: "😶 啥也没有，安静得像坟场", score: 1 }
+            ]
+        },
+        {
+            text: "今天上班/上课，同事/同学突然问你『今晚有约吗』，你第一反应？",
+            options: [
+                { text: "💅 微微一笑：『排满了，档期紧张』", score: 6 },
+                { text: "😏 矜持：『有…有人约了』", score: 5 },
+                { text: "😂 自嘲：『有啊，和外卖小哥』", score: 4 },
+                { text: "🎮 『有，和《王者荣耀》有约』", score: 3 },
+                { text: "😐 『关你屁事』", score: 2 },
+                { text: "😭 低头装死，假装没听到", score: 1 }
+            ]
+        },
+        {
+            text: "你现在的感情状态，用一句歌词形容？",
+            options: [
+                { text: "🎵 『恋爱ing，happy ing』", score: 6 },
+                { text: "🎵 『是心动啊，糟糕眼神躲不掉』（暧昧中）", score: 5 },
+                { text: "🎵 『若爱只剩诱惑，只剩彼此忍受』（快分了）", score: 4 },
+                { text: "🎵 『你是我触碰不到的风』（舔狗勿扰）", score: 3 },
+                { text: "🎵 『爱你孤身走暗巷』（单身且倔强）", score: 2 },
+                { text: "🎵 『寂寞寂寞就好』（已佛系）", score: 1 }
+            ]
+        },
+        {
+            text: "刷到前任秀恩爱，你的操作是？",
+            options: [
+                { text: "👍 反手一个赞：『祝幸福』（心里骂）", score: 6 },
+                { text: "😈 发一条更甜的暗戳戳反击", score: 5 },
+                { text: "🔍 截图放大看ta对象长啥样", score: 4 },
+                { text: "🤮 和朋友吐槽三小时", score: 3 },
+                { text: "🚫 划走，当没看见", score: 2 },
+                { text: "🙏 拉黑，从此消失", score: 1 }
+            ]
+        },
+        {
+            text: "今晚你一个人过，你打算怎么发朋友圈？",
+            options: [
+                { text: "😂 『谁给我转520，我喊你爸爸』", score: 6 },
+                { text: "🍷 红酒杯+『一个人也挺好』", score: 5 },
+                { text: "🐱 晒猫：『只有你陪我』", score: 4 },
+                { text: "📖 拍书：『精神富足不需要男人』", score: 3 },
+                { text: "🤡 发搞笑自拍配『寡王一路硕博』", score: 2 },
+                { text: "🔇 什么都不发，默默打游戏", score: 1 }
+            ]
+        },
+        {
+            text: "你妈突然问你『520有没有人送东西』，你会？",
+            options: [
+                { text: "💪 『追我的人从这排到法国』", score: 6 },
+                { text: "💰 『要不你送我？』", score: 5 },
+                { text: "😭 『妈，别提了，难受』", score: 4 },
+                { text: "🤫 『有…有个屁』", score: 3 },
+                { text: "😶 『别问了，再问自杀』", score: 2 },
+                { text: "📱 转移话题：『妈，今晚吃啥』", score: 1 }
+            ]
+        },
+        {
+            text: "你认为520最该送的对象是？",
+            options: [
+                { text: "💳 自己（狠狠奖励，必须的）", score: 6 },
+                { text: "👩 我妈（唯一真爱）", score: 5 },
+                { text: "🐶 我的狗（它最忠诚）", score: 4 },
+                { text: "📦 外卖小哥（辛苦了）", score: 3 },
+                { text: "💑 对象（如果不装死的话）", score: 2 },
+                { text: "🙅 谁也不送，这节有毒", score: 1 }
+            ]
+        },
+        {
+            text: "如果今晚必须发一条朋友圈，你会配什么图？",
+            options: [
+                { text: "💃 精修自拍+茶里茶气文案", score: 6 },
+                { text: "💰 转账截图（即使只有52.0）", score: 5 },
+                { text: "🤣 一张抽象表情包（啥也不说）", score: 4 },
+                { text: "🌇 天空/风景照+『今天天气不错』", score: 3 },
+                { text: "🍜 一碗泡面+『奢侈一下』", score: 2 },
+                { text: "🔇 什么都不发，但给所有人点赞", score: 1 }
+            ]
+        }
+    ];
+
+    // ---------- 6种人格（分数区间8-48，每档约6-7分）----------
+    const RESULTS = [
+        { 
+            minScore: 8, maxScore: 14,
+            name: "🌵 天选寡王",
+            slogan: "月老拿你当黑名单VIP",
+            desc: "你是520绝缘体，不仅没桃花，连拼多多砍一刀都没人发。但这不妨碍你内心强大——你早已看透红尘，觉得一个人吃火锅、看电影才是终极自由。你的幽默感和自嘲能力满级，朋友都爱找你吐槽。",
+            advice: "今晚朋友圈建议：发一张『寡王一路硕博』表情包，配文『建设美丽中国，从我做起』。保准评论区全是『俺也一样』。",
+            tag: "寡王一路硕博",
+            bgTop: "#2C2E3A", bgBottom: "#434655",
+            accent: "#FFB347"
+        },
+        { 
+            minScore: 15, maxScore: 21,
+            name: "⚡ 人间避雷针",
+            slogan: "精准避开所有桃花运",
+            desc: "你总有神奇的体质：每次你觉得『这次有戏』，对方下一秒就官宣或消失。你不是没人追，而是追你的都是奇葩。你已经学会嗑瓜子看别人演，内心毫无波澜，甚至有点想笑。",
+            advice: "今晚适合发：一张避雷针P图 + 『今日避雷成功，功德+1』。或者转发一首《单身情歌》，艾特那个让你下头的家伙。",
+            tag: "反恋爱脑体质",
+            bgTop: "#3D5A80", bgBottom: "#98C1D9",
+            accent: "#EE6C4D"
+        },
+        { 
+            minScore: 22, maxScore: 28,
+            name: "🎯 反向丘比特",
+            slogan: "射偏是常态，射中才意外",
+            desc: "你有一颗想撩的心，但每次出手都会变成搞笑现场。要么把对方处成了兄弟，要么自爆式表白后连夜扛着火车跑。你身边的朋友都觉得你是喜剧人，但你心底还是渴望甜甜的恋爱。",
+            advice: "今晚发一条『今日战绩：把暧昧对象聊成了拼多多砍一刀战友』。再加一张『我是小丑』表情包，点赞绝对破纪录。",
+            tag: "爱情喜剧人",
+            bgTop: "#D64933", bgBottom: "#F4A261",
+            accent: "#E9C46A"
+        },
+        { 
+            minScore: 29, maxScore: 35,
+            name: "📦 薛定谔的桃花",
+            slogan: "好像有戏，又好像没有",
+            desc: "你处于暧昧的量子叠加态：既不是单身，也不是恋爱。对方今天一整天没找你，你心里演了80集连续剧。你决定发一条仅ta可见的朋友圈，试探一下。",
+            advice: "今晚可以发：一张『在吗』的微信截图 + 『今天520，有些人是不是装死』。然后静静等待……不管结果如何，你都赢了（至少收获了表情包）。",
+            tag: "极限拉扯选手",
+            bgTop: "#9C528B", bgBottom: "#E6A4B4",
+            accent: "#FFD966"
+        },
+        { 
+            minScore: 36, maxScore: 42,
+            name: "👑 隐形凡尔赛",
+            slogan: "嘴上说不要，红包收不少",
+            desc: "你明明收了5200，朋友圈只发『今天也是普通的一天』。你擅长低调炫耀，总能用最平淡的语气暴击单身狗。其实你心里暗爽，但绝不表现出来。",
+            advice: "今晚朋友圈范本：一张咖啡照 + 『谢谢某人，其实不用这么破费』。或者『今天天气真好，适合收花』。记得屏蔽前男友。",
+            tag: "低调炫耀天花板",
+            bgTop: "#2A9D8F", bgBottom: "#E9C46A",
+            accent: "#F4A261"
+        },
+        { 
+            minScore: 43, maxScore: 48,
+            name: "💘 恋爱鬼打墙",
+            slogan: "甜的时候齁死，吵的时候炸死",
+            desc: "你和对象的关系如同坐过山车：上午发誓分手，下午亲亲抱抱。520对你们来说就是大型情绪表演现场。你会发九宫格+小作文，然后又删掉，来回三次。",
+            advice: "今晚建议：直接发一张『我们』的合照，配文『第108次复合，请多指教』。或者发一条仅对方可见的『你是不是不爱我了』，坐等哄你。",
+            tag: "情绪过山车驾驶员",
+            bgTop: "#C44569", bgBottom: "#F3A683",
+            accent: "#F9CA7F"
+        }
+    ];
+
+    let currentQuestionIndex = 0;
+    let totalScore = 0;
+    let userAnswers = new Array(QUESTIONS.length).fill(null);
+    let appState = 'quiz';
+
+    const quizPanel = document.getElementById('quizPanel');
+    const resultPanel = document.getElementById('resultPanel');
+    const questionText = document.getElementById('questionText');
+    const optionsContainer = document.getElementById('optionsContainer');
+    const nextBtn = document.getElementById('nextBtn');
+    const progressFill = document.getElementById('progressFill');
+    const resetBtn = document.getElementById('resetBtn');
+    const resultCanvas = document.getElementById('resultCanvas');
+
+    function renderQuestion() {
+        const q = QUESTIONS[currentQuestionIndex];
+        if (!q) return;
+        questionText.innerText = `${currentQuestionIndex+1}. ${q.text}`;
+        optionsContainer.innerHTML = '';
+        q.options.forEach((opt, idx) => {
+            const btn = document.createElement('div');
+            btn.className = 'option-btn';
+            btn.innerText = opt.text;
+            if (userAnswers[currentQuestionIndex] !== null && userAnswers[currentQuestionIndex] === opt.score) {
+                btn.style.backgroundColor = '#ffe0e0';
+                btn.style.borderColor = '#ff4d6d';
+            } else {
+                btn.style.backgroundColor = 'white';
+                btn.style.borderColor = '#ffb7b7';
+            }
+            btn.addEventListener('click', () => {
+                userAnswers[currentQuestionIndex] = opt.score;
+                renderQuestion();
+            });
+            optionsContainer.appendChild(btn);
+        });
+        const percent = ((currentQuestionIndex) / QUESTIONS.length) * 100;
+        progressFill.style.width = `${percent}%`;
+    }
+
+    function computeResult() {
+        totalScore = userAnswers.reduce((acc, s) => acc + (s || 0), 0);
+        const result = RESULTS.find(r => totalScore >= r.minScore && totalScore <= r.maxScore);
+        return result || RESULTS[0];
+    }
+
+    function wrapText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 4) {
+        let lines = [];
+        let words = text.split('');
+        let currentLine = '';
+        for (let i = 0; i < words.length; i++) {
+            let testLine = currentLine + words[i];
+            let metrics = ctx.measureText(testLine);
+            if (metrics.width > maxWidth && currentLine.length > 0) {
+                lines.push(currentLine);
+                currentLine = words[i];
+                if (lines.length >= maxLines) break;
+            } else {
+                currentLine = testLine;
+            }
+        }
+        if (currentLine.length > 0 && lines.length < maxLines) lines.push(currentLine);
+        for (let i = 0; i < lines.length; i++) {
+            ctx.fillText(lines[i], x, y + i * lineHeight);
+        }
+        return y + lines.length * lineHeight;
+    }
+
+    async function drawResultCard(result) {
+        const canvas = resultCanvas;
+        const ctx = canvas.getContext('2d');
+        const width = 1080, height = 1350;
+        canvas.width = width;
+        canvas.height = height;
+
+        const grad = ctx.createLinearGradient(0, 0, 0, height);
+        grad.addColorStop(0, result.bgTop);
+        grad.addColorStop(1, result.bgBottom);
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, width, height);
+
+        // 装饰圆点
+        ctx.save();
+        for (let i = 0; i < 10; i++) {
+            ctx.beginPath();
+            ctx.arc(width - 100 + i*20, 150 + i*25, 20, 0, Math.PI*2);
+            ctx.fillStyle = result.accent + '30';
+            ctx.fill();
+        }
+        
+        ctx.font = `bold 56px "PingFang SC", "Segoe UI", system-ui`;
+        ctx.fillStyle = '#FFFFFF';
+        ctx.shadowColor = 'rgba(0,0,0,0.2)';
+        ctx.shadowBlur = 8;
+        ctx.fillText('520 人格报告', 80, 140);
+        
+        ctx.font = `bold 88px "PingFang SC", "Segoe UI"`;
+        ctx.fillStyle = result.accent;
+        ctx.fillText(result.name, 80, 300);
+        
+        ctx.font = `44px "PingFang SC", "Segoe UI"`;
+        ctx.fillStyle = '#FFF0C0';
+        ctx.fillText(result.slogan, 80, 380);
+        
+        ctx.font = `36px "PingFang SC"`;
+        ctx.fillStyle = '#FFF9E6';
+        ctx.fillText(result.tag, 80, 460);
+        
+        // 详细解释
+        ctx.font = `38px "PingFang SC"`;
+        ctx.fillStyle = '#FFF5EA';
+        let yPos = 580;
+        yPos = wrapText(ctx, result.desc, 80, yPos, 920, 50, 4);
+        
+        // 行动建议
+        ctx.font = `36px "PingFang SC"`;
+        ctx.fillStyle = '#FFE6C7';
+        yPos += 30;
+        ctx.fillText('📢 今日发圈建议', 80, yPos);
+        yPos += 50;
+        ctx.font = `32px "PingFang SC"`;
+        ctx.fillStyle = '#FFEFD0';
+        yPos = wrapText(ctx, result.advice, 80, yPos, 920, 44, 4);
+        
+        // 分数
+        ctx.font = `34px "PingFang SC"`;
+        ctx.fillStyle = '#FFD6AA';
+        yPos += 40;
+        ctx.fillText(`🎭 发疯指数 · ${totalScore}分（满分48）`, 80, yPos);
+        
+        // 分割线
+        yPos += 40;
+        ctx.beginPath();
+        ctx.moveTo(80, yPos);
+        ctx.lineTo(width-80, yPos);
+        ctx.lineWidth = 6;
+        ctx.strokeStyle = result.accent + '80';
+        ctx.stroke();
+        
+        // 底部号召
+        yPos += 60;
+        ctx.font = `38px "PingFang SC"`;
+        ctx.fillStyle = '#FFFFFFDD';
+        ctx.fillText('长按图片发朋友圈', 80, yPos);
+        yPos += 50;
+        ctx.font = `32px "PingFang SC"`;
+        ctx.fillStyle = '#FFE0B5';
+        ctx.fillText('测出你的520真面目', 80, yPos);
+        
+        yPos += 60;
+        ctx.font = `28px "PingFang SC"`;
+        ctx.fillStyle = '#FFD966AA';
+        ctx.fillText('🔗 扫码也来发疯', 80, yPos);
+        
+        const today = new Date().toLocaleDateString('zh-CN');
+        ctx.font = `28px "PingFang SC"`;
+        ctx.fillStyle = '#FFFFFFAA';
+        ctx.fillText(`520 · ${today} 限定`, width-280, yPos+20);
+        ctx.shadowBlur = 0;
+    }
+
+    async function showResultScreen() {
+        const result = computeResult();
+        quizPanel.classList.add('hidden');
+        resultPanel.classList.remove('hidden');
+        await drawResultCard(result);
+    }
+
+    function onNext() {
+        if (userAnswers[currentQuestionIndex] === null || userAnswers[currentQuestionIndex] === undefined) {
+            alert('选一个嘛！选完再下一题 🌚');
+            return;
+        }
+        if (currentQuestionIndex + 1 < QUESTIONS.length) {
+            currentQuestionIndex++;
+            renderQuestion();
+        } else {
+            showResultScreen();
+        }
+    }
+
+    function resetTest() {
+        currentQuestionIndex = 0;
+        totalScore = 0;
+        userAnswers = new Array(QUESTIONS.length).fill(null);
+        quizPanel.classList.remove('hidden');
+        resultPanel.classList.add('hidden');
+        renderQuestion();
+    }
+
+    function init() {
+        renderQuestion();
+        nextBtn.addEventListener('click', onNext);
+        resetBtn.addEventListener('click', resetTest);
+    }
+
+    init();
+</script>
+</body>
+</html>
